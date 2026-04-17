@@ -445,9 +445,16 @@ function getAIDecision() {
 function buildStep7() {
   const decision = getAIDecision();
   const c = currentCountry;
-  if (decision === "simple") return `<div class="ai-decision"><div class="ai-badge ai-badge-green">✅ Straightforward Profile</div><h3>You're good to go!</h3><p>Based on your answers, your application looks clean and ready.</p><div class="ai-price-card"><div class="ai-price-label">Visa Fee</div><div class="ai-price-value">${c.fees}</div><div class="ai-price-sub">${c.type} · ${c.validity}</div></div><div class="ai-decision-actions"><button class="btn-next" onclick="currentStep=8;renderModal()">Review &amp; Submit →</button></div></div>`;
-  if (decision === "high_risk") return `<div class="ai-decision"><div class="ai-badge ai-badge-red">🚨 Consultation Recommended</div><h3>Let's make sure you're protected</h3><p>Proceeding without expert guidance could increase rejection risk.</p><div class="ai-decision-actions"><button class="btn-consult" onclick="bookConsultation()">Book a Consultation →</button></div></div>`;
-  return `<div class="ai-decision"><div class="ai-badge ai-badge-yellow">⚠️ Review Suggested</div><h3>A quick heads-up</h3><p>Speaking with a consultant often improves approval odds.</p><div class="ai-decision-actions"><button class="btn-consult" onclick="bookConsultation()">Talk to a Consultant</button><button class="btn-back" onclick="currentStep=8;renderModal()">Continue Anyway →</button></div></div>`;
+  
+  if (decision === "simple") {
+    return `<div class="ai-decision"><div class="ai-badge ai-badge-green">✅ Straightforward Profile</div><h3>You're good to go!</h3><p>Based on your answers, your application looks clean and ready.</p><div class="ai-price-card"><div class="ai-price-label">Visa Fee</div><div class="ai-price-value">${c.fees}</div><div class="ai-price-sub">${c.type} · ${c.validity}</div></div><div class="ai-decision-actions"><button class="btn-next" onclick="currentStep=8;renderModal()">Review &amp; Submit →</button></div></div>`;
+  }
+  
+  if (decision === "high_risk") {
+    return `<div class="ai-decision"><div class="ai-badge ai-badge-red">🚨 Consultation Recommended</div><h3>Let's make sure you're protected</h3><p>Proceeding without expert guidance could increase rejection risk.</p><div class="ai-decision-actions"><button class="btn-consult" onclick="window.open('https://calendly.com/blancvelvet-co', '_blank')">📅 Book a Consultation →</button></div></div>`;
+  }
+  
+  return `<div class="ai-decision"><div class="ai-badge ai-badge-yellow">⚠️ Review Suggested</div><h3>A quick heads-up</h3><p>Speaking with a consultant often improves approval odds.</p><div class="ai-decision-actions"><button class="btn-consult" onclick="window.open('https://calendly.com/blancvelvet-co', '_blank')">📅 Talk to a Consultant</button><button class="btn-back" onclick="currentStep=8;renderModal()">Continue Anyway →</button></div></div>`;
 }
 
 function buildStep8() {
