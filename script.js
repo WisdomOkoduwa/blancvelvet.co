@@ -592,7 +592,7 @@ function submitForm() {
   // Create hidden form
   const form = document.createElement('form');
   form.method = 'POST';
-  form.action = 'https://formspree.io/f/mdapbpvw';
+  form.action = 'https://formspree.io/f/xojraorv';
   form.target = 'hidden_iframe';
   form.style.display = 'none';
   
