@@ -649,3 +649,194 @@ document.addEventListener("DOMContentLoaded", () => {
   initFilters();
   document.getElementById("modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
 });
+
+/* ========================================================
+   ===== START OF NEW SECTIONS JS =====
+   ======================================================== */
+
+/* ===== START OF NEW SECTION: TESTIMONIALS SLIDER ===== */
+
+(function initTestimonialsSlider() {
+  document.addEventListener('DOMContentLoaded', function () {
+
+    var track      = document.getElementById('testiTrack');
+    var dotsWrap   = document.getElementById('testiDots');
+    var prevBtn    = document.getElementById('testiPrev');
+    var nextBtn    = document.getElementById('testiNext');
+
+    if (!track || !dotsWrap) return;
+
+    var cards       = Array.from(track.children);
+    var totalCards  = cards.length;
+    var current     = 0;
+    var autoTimer   = null;
+    var DURATION    = 5000; // ms between auto-slides
+
+    /* ── Determine cards visible based on viewport ── */
+    function getVisible() {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 641)  return 2;
+      return 1;
+    }
+
+    /* ── Build dots ── */
+    function buildDots() {
+      dotsWrap.innerHTML = '';
+      var visible = getVisible();
+      var pages   = Math.ceil(totalCards / visible);
+      for (var i = 0; i < pages; i++) {
+        var btn = document.createElement('button');
+        btn.className = 'testi-dot' + (i === 0 ? ' active' : '');
+        btn.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        btn.dataset.page = i;
+        dotsWrap.appendChild(btn);
+      }
+    }
+
+    /* ── Move track ── */
+    function goTo(page) {
+      var visible    = getVisible();
+      var pages      = Math.ceil(totalCards / visible);
+      current = ((page % pages) + pages) % pages; // wrap
+
+      var cardWidth  = cards[0].offsetWidth;
+      var gap        = 20; // matches CSS gap 1.25rem ~ 20px
+      var offset     = current * visible * (cardWidth + gap);
+      track.style.transform = 'translateX(-' + offset + 'px)';
+
+      // Update dots
+      Array.from(dotsWrap.children).forEach(function (d, i) {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    /* ── Auto-slide ── */
+    function startAuto() {
+      stopAuto();
+      autoTimer = setInterval(function () {
+        goTo(current + 1);
+      }, DURATION);
+    }
+
+    function stopAuto() {
+      if (autoTimer) clearInterval(autoTimer);
+    }
+
+    /* ── Init ── */
+    buildDots();
+    goTo(0);
+    startAuto();
+
+    /* ── Arrow controls ── */
+    prevBtn.addEventListener('click', function () {
+      stopAuto();
+      goTo(current - 1);
+      startAuto();
+    });
+
+    nextBtn.addEventListener('click', function () {
+      stopAuto();
+      goTo(current + 1);
+      startAuto();
+    });
+
+    /* ── Dot controls ── */
+    dotsWrap.addEventListener('click', function (e) {
+      if (e.target.classList.contains('testi-dot')) {
+        stopAuto();
+        goTo(parseInt(e.target.dataset.page, 10));
+        startAuto();
+      }
+    });
+
+    /* ── Rebuild on resize ── */
+    window.addEventListener('resize', function () {
+      buildDots();
+      goTo(0);
+    });
+
+    /* ── Touch/swipe support ── */
+    var touchStartX = null;
+
+    track.parentElement.addEventListener('touchstart', function (e) {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    track.parentElement.addEventListener('touchend', function (e) {
+      if (touchStartX === null) return;
+      var diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        stopAuto();
+        goTo(diff > 0 ? current + 1 : current - 1);
+        startAuto();
+      }
+      touchStartX = null;
+    }, { passive: true });
+
+  });
+})();
+
+/* ===== END OF NEW SECTION: TESTIMONIALS SLIDER ===== */
+
+
+/* ===== START OF NEW SECTION: SCROLL REVEAL ANIMATIONS ===== */
+
+(function initScrollReveal() {
+  // Skip if IntersectionObserver not supported
+  if (!('IntersectionObserver' in window)) return;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var style = document.createElement('style');
+    style.textContent = `
+      .reveal { opacity: 0; transform: translateY(28px); transition: opacity .55s ease, transform .55s ease; }
+      .reveal.visible { opacity: 1; transform: translateY(0); }
+      .reveal-delay-1 { transition-delay: .1s; }
+      .reveal-delay-2 { transition-delay: .2s; }
+      .reveal-delay-3 { transition-delay: .3s; }
+      .reveal-delay-4 { transition-delay: .4s; }
+    `;
+    document.head.appendChild(style);
+
+    // Apply reveal classes to new section elements
+    var targets = [
+      { selector: '.service-card', delay: true },
+      { selector: '.dest-card',    delay: true },
+      { selector: '.testi-stat',   delay: true },
+    ];
+
+    targets.forEach(function (t) {
+      var els = document.querySelectorAll(t.selector);
+      els.forEach(function (el, i) {
+        el.classList.add('reveal');
+        if (t.delay) {
+          var d = (i % 4) + 1;
+          el.classList.add('reveal-delay-' + d);
+        }
+      });
+    });
+
+    // Section headings
+    document.querySelectorAll(
+      '.services-section .section-title, .destinations-section .section-title, .cta-heading'
+    ).forEach(function (el) { el.classList.add('reveal'); });
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      observer.observe(el);
+    });
+  });
+})();
+
+/* ===== END OF NEW SECTION: SCROLL REVEAL ANIMATIONS ===== */
+
+/* ========================================================
+   ===== END OF NEW SECTIONS JS =====
+   ======================================================== */
